@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+require 'git'
+
+# you have to define git_ext file on your prject directory.
+#
+# ex: git_ext
+# # get issue-id from branchname by regexp.
+# issue_pattern /issue_([\d]+)$/ do
+#   $1
+# end
+#
+# # get a url of an issue page.
+# issue_url do |issue|
+#   "http://issue.com/view/#{issue}"
+# end
+
+def usage
+  puts 'git issue # open browser and show current branch\'s issue'
+end
+
+def error(message)
+  puts message
+  exit!
+end
+
+def issue_pattern(pattern, &block)
+  @issue_pattern = pattern
+  @issue_block = block
+end
+
+def issue_url(&block)
+  @issue_url_block = block
+end
+
+def main 
+  git_ext_path = File.join(Dir.pwd, "git_ext")
+  error("not found git_ext file") if not File.exists?(git_ext_path)
+
+  # git_extファイルを読み込む
+  # issue_patternの戻り値で$1などを利用したかったためevalを利用。
+  binding.eval(File.read(git_ext_path))
+
+  g = Git.open(Dir.pwd)
+
+  branch_name = g.current_branch
+
+  if branch_name =~ /#{@issue_pattern}/
+    issue = (@issue_block ? instance_eval(&@issue_block) : $1)
+  end
+
+  url =   @issue_url_block.call(issue)
+  `open #{url}`
+end
+
+main
+
+
+
