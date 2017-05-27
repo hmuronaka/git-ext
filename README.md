@@ -6,6 +6,8 @@ gitのブランチ名がissue-noを表す場合、+0.1楽にするコマンド�
 
 # prepare
 
+install [ruby-git](https://github.com/schacon/ruby-git)
+
 ```sh
 gem install git
 ```
