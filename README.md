@@ -13,7 +13,7 @@ install [ruby-git](https://github.com/schacon/ruby-git)
 gem install git
 ```
 
-# git chk branch_name
+# git chk
 
 ブランチをcheckoutする際、branch名を後方探索する。
 ローカルにブランチがある場合は、それに切り替える。
