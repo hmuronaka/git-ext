@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+
+require 'git'
+require 'erb'
+require_relative './git_ext'
+
+# you have to define git_ext file on your prject directory.
+#
+# # get a url of an pullreq page.
+# pullreq_url do |branch|
+#  "https://issue.com/pullreq/#{branch}"
+# end
+#
+#
+module GitExt
+  def usage
+    puts 'git pullreq # open browser and pullreq current branch\'s issue'
+  end
+
+  def error(message)
+    puts message
+    exit!
+  end
+
+  def main 
+
+    git_ext_path = File.join(Dir.pwd, "git_ext")
+    error("not found git_ext file") if not File.exists?(git_ext_path)
+
+    config = Config.new
+    config.read(git_ext_path)
+
+    g = Git.open(Dir.pwd)
+    branch_name = g.current_branch
+
+    url = config.pullreq_url_block.call(ERB::Util.url_encode(branch_name))
+    `open #{url}`
+  end
+end
+
+include GitExt
+main
+
+
+
