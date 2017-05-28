@@ -1,50 +1,44 @@
 #!/usr/bin/env ruby
 
 require 'git'
+require_relative './git_ext'
 
-def usage
-  puts 'git chk #{issue_no} # checkout a branch by a pattern #{issue_no}$'
-end
+module GitExt
 
-def error(message)
-  puts message
-  exit!
-end
+  include Lib
 
-def find_from_branch(g, local_or_remote, branch_name)
-  branches = (local_or_remote == :local ? g.branches.local : g.branches.remote)
-
-  # TODO 複数のブランチがヒットした場合
-  branches.select { |b| b.name =~ /#{branch_name}$/ }.first
-end
-
-def main
-
-  if ARGV.empty?
-    usage 
-    exit!
+  def usage
+    puts 'git chk #{issue_no} # checkout a branch by a pattern #{issue_no}$'
   end
 
-  branch_name = ARGV[0]
+  def main
 
-  g = Git.open(Dir.pwd)
-  puts g.current_branch
+    if ARGV.empty?
+      usage 
+      exit!
+    end
 
-  target_branch = find_from_branch(g, :local, branch_name)
-  target_branch = find_from_branch(g, :remote, branch_name) if target_branch.nil?
-  error "not found from #{branch_name}" if target_branch.nil?
+    branch_name = ARGV[0]
 
-  exit! if target_branch.name == g.current_branch
+    g = Git.open(Dir.pwd)
 
-  if g.is_local_branch?(target_branch.full)
-    target_branch.checkout
-  else g.is_remote_branch?(target_branch.full)
-    # gでremote branchをcheckoutする方法が分からなかった為、
-    # 直接コマンドを実行している
-    `git checkout -b #{target_branch.name} #{target_branch.full}`
+    target_branch = find_from_branch(g, :local, branch_name)
+    target_branch = find_from_branch(g, :remote, branch_name) if target_branch.nil?
+    error "not found from #{branch_name}" if target_branch.nil?
+
+    exit! if target_branch.name == g.current_branch
+
+    if g.is_local_branch?(target_branch.full)
+      target_branch.checkout
+    else g.is_remote_branch?(target_branch.full)
+      # gでremote branchをcheckoutする方法が分からなかった為、
+      # 直接コマンドを実行している
+      `git checkout -b #{target_branch.name} #{target_branch.full}`
+    end
   end
 end
 
+include GitExt
 main
 
 
