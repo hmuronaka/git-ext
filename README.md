@@ -61,8 +61,8 @@ issue_url do |issue|
   "https://issue.com/issues/#{issue}"
 end
 
-pullreq_url do |branch|
-  "https://issue.com/pullreq/#{branch}"
+pullreq_url do |from_branch, to_branch|
+  "https://issue.com/pullreq/#{to_branch}...#{from_branch}"
 end
 ```
 

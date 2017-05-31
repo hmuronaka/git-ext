@@ -31,9 +31,10 @@ module GitExt
     config.read(git_ext_path)
 
     g = Git.open(Dir.pwd)
-    branch_name = g.current_branch
+    to_branch_name = ARGV.length > 0 ? ARGV[0] : ""
+    from_branch_name = g.current_branch
 
-    url = config.pullreq_url_block.call(ERB::Util.url_encode(branch_name))
+    url = config.pullreq_url_block.call(ERB::Util.url_encode(from_branch_name), ERB::Util.url_encode(to_branch_name))
     `open #{url}`
   end
 end
